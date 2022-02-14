@@ -69,6 +69,8 @@ declare module ApexCharts {
     tooltip?: ApexTooltip
     xaxis?: ApexXAxis
     yaxis?: ApexYAxis | ApexYAxis[]
+    endingShape?: 'flat' | 'rounded',
+    startingShape?: 'flat' | 'rounded',
   }
 }
 

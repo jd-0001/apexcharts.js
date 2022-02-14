@@ -6487,7 +6487,15 @@
 
         if (w.config.chart.stacked && series.length > 1 && i !== this.barCtx.radiusOnSeriesNumber && !borderRadiusIsArray) {
           radius = 0;
-        }
+        } // if (
+        //   w.config.chart.stacked &&
+        //   series.length > 1 &&
+        //   i !== this.barCtx.radiusOnSeriesNumber &&
+        //   !borderRadiusIsArray
+        // ) {
+        //   radius = 0
+        // }
+
 
         if (this.barCtx.isHorizontal) {
           var startingShape = '';
@@ -9340,20 +9348,6 @@
             } else {
               this.twoDSeries.push(Utils$1.parseNumber(ser[i].data[j].y));
             }
-          }
-
-          if (typeof ser[i].data[j].goals !== 'undefined' && Array.isArray(ser[i].data[j].goals)) {
-            if (typeof this.seriesGoals[i] === 'undefined') {
-              this.seriesGoals[i] = [];
-            }
-
-            this.seriesGoals[i].push(ser[i].data[j].goals);
-          } else {
-            if (typeof this.seriesGoals[i] === 'undefined') {
-              this.seriesGoals[i] = [];
-            }
-
-            this.seriesGoals[i].push(null);
           }
 
           if (typeof ser[i].data[j].goals !== 'undefined' && Array.isArray(ser[i].data[j].goals)) {
