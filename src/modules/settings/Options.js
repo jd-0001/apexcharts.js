@@ -13,6 +13,7 @@ export default class Options {
       opposite: false,
       reversed: false,
       logarithmic: false,
+      logBase: 10,
       tickAmount: undefined,
       forceNiceScale: false,
       max: undefined,
@@ -80,10 +81,13 @@ export default class Options {
     }
 
     this.pointAnnotation = {
+      id: undefined,
       x: 0,
       y: null,
       yAxisIndex: 0,
       seriesIndex: 0,
+      mouseEnter: undefined,
+      mouseLeave: undefined,
       marker: {
         size: 4,
         fillColor: '#fff',
@@ -103,6 +107,8 @@ export default class Options {
         textAnchor: 'middle',
         offsetX: 0,
         offsetY: 0,
+        mouseEnter: undefined,
+        mouseLeave: undefined,
         style: {
           background: '#fff',
           color: undefined,
@@ -135,6 +141,7 @@ export default class Options {
     }
 
     this.yAxisAnnotation = {
+      id: undefined,
       y: 0,
       y2: null,
       strokeDashArray: 1,
@@ -155,6 +162,8 @@ export default class Options {
         position: 'right',
         offsetX: 0,
         offsetY: -3,
+        mouseEnter: undefined,
+        mouseLeave: undefined,
         style: {
           background: '#fff',
           color: undefined,
@@ -173,6 +182,7 @@ export default class Options {
     }
 
     this.xAxisAnnotation = {
+      id: undefined,
       x: 0,
       x2: null,
       strokeDashArray: 1,
@@ -192,6 +202,8 @@ export default class Options {
         position: 'top',
         offsetX: 0,
         offsetY: 0,
+        mouseEnter: undefined,
+        mouseLeave: undefined,
         style: {
           background: '#fff',
           color: undefined,

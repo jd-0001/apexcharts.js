@@ -22,7 +22,11 @@ export default class PointAnnotations {
 
     let annoY = parseFloat(anno.y)
 
-    if (typeof anno.x === 'string') {
+    if (
+      typeof anno.x === 'string' ||
+      w.config.xaxis.type === 'category' ||
+      w.config.xaxis.convertedCatToNumeric
+    ) {
       let catIndex = w.globals.labels.indexOf(anno.x)
 
       if (w.config.xaxis.convertedCatToNumeric) {
@@ -148,7 +152,7 @@ export default class PointAnnotations {
       let imgWidth = anno.image.width ? anno.image.width : 20
       let imgHeight = anno.image.height ? anno.image.height : 20
 
-      this.annoCtx.addImage({
+      point = this.annoCtx.addImage({
         x: x + anno.image.offsetX - imgWidth / 2,
         y: y + anno.image.offsetY - imgHeight / 2,
         width: imgWidth,
@@ -156,6 +160,19 @@ export default class PointAnnotations {
         path: anno.image.path,
         appendTo: '.apexcharts-point-annotations'
       })
+    }
+
+    if (anno.mouseEnter) {
+      point.node.addEventListener(
+        'mouseenter',
+        anno.mouseEnter.bind(this, anno)
+      )
+    }
+    if (anno.mouseLeave) {
+      point.node.addEventListener(
+        'mouseleave',
+        anno.mouseLeave.bind(this, anno)
+      )
     }
   }
 

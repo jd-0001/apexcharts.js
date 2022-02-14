@@ -5,6 +5,7 @@ import Utilities from '../../utils/Utils'
 
 /**
  * ApexCharts Tooltip.Labels Class to draw texts on the tooltip.
+ * This file deals with printing actual text on the tooltip.
  *
  * @module Tooltip.Labels
  **/
@@ -63,7 +64,7 @@ export default class Labels {
 
     let seriesName = ''
 
-    let pColor = w.globals.colors[i]
+    let pColor = w.globals.colors[i] // The pColor here is for the markers inside tooltip
     if (j !== null && w.config.plotOptions.bar.distributed) {
       pColor = w.globals.colors[j]
     }
@@ -238,7 +239,6 @@ export default class Labels {
     ttItemsChildren = ttItems[t].children
 
     if (w.config.tooltip.fillSeriesColor) {
-      //  elTooltip.style.backgroundColor = pColor
       ttItems[t].style.backgroundColor = pColor
       ttItemsChildren[0].style.display = 'none'
     }
@@ -254,7 +254,7 @@ export default class Labels {
     }
 
     // if xaxis tooltip is constructed, we need to replace the innerHTML
-    if (ttCtx.blxaxisTooltip) {
+    if (ttCtx.isXAxisTooltipEnabled) {
       ttCtx.xaxisTooltipText.innerHTML = xAxisTTVal !== '' ? xAxisTTVal : xVal
     }
 
@@ -339,6 +339,7 @@ export default class Labels {
       if (
         typeof val === 'undefined' ||
         val === null ||
+        w.globals.ancillaryCollapsedSeriesIndices.indexOf(t) > -1 ||
         w.globals.collapsedSeriesIndices.indexOf(t) > -1
       ) {
         ttItemsChildren[0].parentNode.style.display = 'none'

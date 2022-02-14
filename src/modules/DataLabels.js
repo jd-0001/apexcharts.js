@@ -182,7 +182,8 @@ class DataLabels {
     let correctedLabels = {
       x,
       y,
-      drawnextLabel: true
+      drawnextLabel: true,
+      textRects: null
     }
 
     if (offsetCorrection) {

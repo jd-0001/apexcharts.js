@@ -1,3 +1,5 @@
+import Utils from '../../utils/Utils'
+
 export default class Helpers {
   constructor(annoCtx) {
     this.w = annoCtx.w
@@ -46,8 +48,9 @@ export default class Helpers {
 
     if (
       !annoEl ||
-      !anno.label.text ||
-      (anno.label.text && !anno.label.text.trim())
+      typeof anno.label.text === 'undefined' ||
+      (typeof anno.label.text !== 'undefined' &&
+        !String(anno.label.text).trim())
     )
       return null
 
@@ -85,7 +88,7 @@ export default class Helpers {
     )
 
     if (anno.id) {
-      elRect.node.classList.add(anno.id)
+      elRect.node.classList.add(Utils.escapeString(anno.id))
     }
 
     return elRect
@@ -105,6 +108,19 @@ export default class Helpers {
 
         if (elRect) {
           parent.insertBefore(elRect.node, annoLabel)
+
+          if (anno.label.mouseEnter) {
+            elRect.node.addEventListener(
+              'mouseenter',
+              anno.label.mouseEnter.bind(this, anno)
+            )
+          }
+          if (anno.label.mouseLeave) {
+            elRect.node.addEventListener(
+              'mouseleave',
+              anno.label.mouseLeave.bind(this, anno)
+            )
+          }
         }
       }
     }

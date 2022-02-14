@@ -53,7 +53,7 @@ export default class Helpers {
     let x, y, yDivision, xDivision, barHeight, barWidth, zeroH, zeroW
 
     let dataPoints = w.globals.dataPoints
-    if (this.barCtx.isTimelineBar) {
+    if (this.barCtx.isRangeBar) {
       // timeline rangebar chart
       dataPoints = w.globals.labels.length
     }
@@ -391,6 +391,15 @@ export default class Helpers {
       radius = borderRadius[radiusIndex]
     } else {
       radius = borderRadius
+    }
+
+    if (
+      w.config.chart.stacked &&
+      series.length > 1 &&
+      i !== this.barCtx.radiusOnSeriesNumber &&
+      !borderRadiusIsArray
+    ) {
+      radius = 0
     }
 
     // if (

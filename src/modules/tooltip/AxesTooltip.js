@@ -1,5 +1,6 @@
 /**
  * ApexCharts Tooltip.AxesTooltip Class.
+ * This file deals with the x-axis and y-axis tooltips.
  *
  * @module Tooltip.AxesTooltip
  **/
@@ -29,7 +30,7 @@ class AxesTooltip {
 
     let renderTo = w.globals.dom.elWrap
 
-    if (ttCtx.blxaxisTooltip) {
+    if (ttCtx.isXAxisTooltipEnabled) {
       let xaxisTooltip = w.globals.dom.baseEl.querySelector(
         '.apexcharts-xaxistooltip'
       )

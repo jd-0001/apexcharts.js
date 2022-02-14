@@ -20,11 +20,11 @@ declare class ApexCharts {
   updateSeries(
     newSeries: ApexAxisChartSeries | ApexNonAxisChartSeries,
     animate?: boolean
-  ): void
+  ): Promise<void>
   appendSeries(
     newSeries: ApexAxisChartSeries | ApexNonAxisChartSeries,
     animate?: boolean
-  ): void
+  ): Promise<void>
   appendData(data: any[], overwriteInitialSeries?: boolean): void
   toggleSeries(seriesName: string): any
   showSeries(seriesName: string): void
@@ -349,6 +349,8 @@ type AnnotationLabel = {
   style?: AnnotationStyle
   position?: string
   orientation?: string
+  mouseEnter?: Function
+  mouseLeave?: Function
 }
 
 type AnnotationStyle = {
@@ -367,6 +369,7 @@ type AnnotationStyle = {
 }
 
 type XAxisAnnotations = {
+  id?: number | string
   x?: null | number | string
   x2?: null | number | string
   strokeDashArray?: number
@@ -380,6 +383,7 @@ type XAxisAnnotations = {
 }
 
 type YAxisAnnotations = {
+  id?: number | string
   y?: null | number | string
   y2?: null | number | string
   strokeDashArray?: number
@@ -395,10 +399,13 @@ type YAxisAnnotations = {
 }
 
 type PointAnnotations = {
+  id?: number | string
   x?: number | string
   y?: null | number
   yAxisIndex?: number
   seriesIndex?: number
+  mouseEnter?: Function
+  mouseLeave?: Function
   marker?: {
     size?: number
     fillColor?: string
@@ -793,7 +800,7 @@ type ApexDiscretePoint = {
 
 type ApexMarkers = {
   size?: number | number[]
-  colors?: string[]
+  colors?: string | string[]
   strokeColors?: string | string[]
   strokeWidth?: number | number[]
   strokeOpacity?: number | number[]
@@ -1038,7 +1045,8 @@ type ApexYAxis = {
   seriesName?: string
   opposite?: boolean
   reversed?: boolean
-  logarithmic?: boolean
+  logarithmic?: boolean,
+  logBase?: number,
   tickAmount?: number
   forceNiceScale?: boolean
   min?: number | ((min: number) => number)

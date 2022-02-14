@@ -129,12 +129,18 @@ export default class ZoomPanSelection extends Toolbar {
       }
     }
 
+    if (!e.target) return
+
     const tc = e.target.classList
+    let pc
+    if (e.target.parentNode && e.target.parentNode !== null) {
+      pc = e.target.parentNode.classList
+    }
     const falsePositives =
       tc.contains('apexcharts-selection-rect') ||
       tc.contains('apexcharts-legend-marker') ||
       tc.contains('apexcharts-legend-text') ||
-      e.target.parentNode.classList.contains('apexcharts-toolbar')
+      (pc && pc.contains('apexcharts-toolbar'))
 
     if (falsePositives) return
 
@@ -510,7 +516,7 @@ export default class ZoomPanSelection extends Toolbar {
     let xLowestValue = undefined
     let xHighestValue = undefined
 
-    if (!w.globals.isTimelineBar) {
+    if (!w.globals.isRangeBar) {
       xLowestValue = w.globals.xAxisScale.niceMin + me.startX * xyRatios.xRatio
       xHighestValue = w.globals.xAxisScale.niceMin + me.endX * xyRatios.xRatio
     } else {
@@ -659,11 +665,9 @@ export default class ZoomPanSelection extends Toolbar {
       y: me.clientY
     }
 
-    let xLowestValue = w.globals.isTimelineBar ? w.globals.minY : w.globals.minX
+    let xLowestValue = w.globals.isRangeBar ? w.globals.minY : w.globals.minX
 
-    let xHighestValue = w.globals.isTimelineBar
-      ? w.globals.maxY
-      : w.globals.maxX
+    let xHighestValue = w.globals.isRangeBar ? w.globals.maxY : w.globals.maxX
 
     // on a category, we don't pan continuosly as it causes bugs
     if (!w.config.xaxis.convertedCatToNumeric) {
@@ -704,7 +708,7 @@ export default class ZoomPanSelection extends Toolbar {
     let xRatio = xyRatios.xRatio
     let minX = w.globals.minX
     let maxX = w.globals.maxX
-    if (w.globals.isTimelineBar) {
+    if (w.globals.isRangeBar) {
       xRatio = xyRatios.invertedYRatio
       minX = w.globals.minY
       maxX = w.globals.maxY
@@ -718,7 +722,7 @@ export default class ZoomPanSelection extends Toolbar {
       xHighestValue = maxX - (w.globals.gridWidth / 15) * xRatio
     }
 
-    if (!w.globals.isTimelineBar) {
+    if (!w.globals.isRangeBar) {
       if (
         xLowestValue < w.globals.initialMinX ||
         xHighestValue > w.globals.initialMaxX

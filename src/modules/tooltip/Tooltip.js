@@ -34,10 +34,13 @@ export default class Tooltip {
     this.xaxisTooltip = null
     this.yaxisTTEls = null
     this.isBarShared = !w.globals.isBarHorizontal && this.tConfig.shared
+    this.lastHoverTime = Date.now()
   }
 
   getElTooltip(ctx) {
     if (!ctx) ctx = this
+    if (!ctx.w.globals.dom.baseEl) return null
+
     return ctx.w.globals.dom.baseEl.querySelector('.apexcharts-tooltip')
   }
 
@@ -52,7 +55,8 @@ export default class Tooltip {
   drawTooltip(xyRatios) {
     let w = this.w
     this.xyRatios = xyRatios
-    this.blxaxisTooltip = w.config.xaxis.tooltip.enabled && w.globals.axisCharts
+    this.isXAxisTooltipEnabled =
+      w.config.xaxis.tooltip.enabled && w.globals.axisCharts
     this.yaxisTooltips = w.config.yaxis.map((y, i) => {
       return y.show && y.tooltip.enabled && w.globals.axisCharts ? true : false
     })
@@ -340,7 +344,7 @@ export default class Tooltip {
       events.map((ev) => {
         return paths[p].addEventListener(
           ev,
-          self.seriesHover.bind(self, extendedOpts),
+          self.onSeriesHover.bind(self, extendedOpts),
           { capture: false, passive: true }
         )
       })
@@ -348,9 +352,34 @@ export default class Tooltip {
   }
 
   /*
+   ** Check to see if the tooltips should be updated based on a mouse / touch event
+   */
+  onSeriesHover(opt, e) {
+    // If a user is moving their mouse quickly, don't bother updating the tooltip every single frame
+
+    const targetDelay = 100
+    const timeSinceLastUpdate = Date.now() - this.lastHoverTime
+    if (timeSinceLastUpdate >= targetDelay) {
+      // The tooltip was last updated over 100ms ago - redraw it even if the user is still moving their
+      // mouse so they get some feedback that their moves are being registered
+      this.seriesHover(opt, e)
+    } else {
+      // The tooltip was last updated less than 100ms ago
+      // Cancel any other delayed draw, so we don't show stale data
+      clearTimeout(this.seriesHoverTimeout)
+
+      // Schedule the next draw so that it happens about 100ms after the last update
+      this.seriesHoverTimeout = setTimeout(() => {
+        this.seriesHover(opt, e)
+      }, targetDelay - timeSinceLastUpdate)
+    }
+  }
+
+  /*
    ** The actual series hover function
    */
   seriesHover(opt, e) {
+    this.lastHoverTime = Date.now()
     let chartGroups = []
     const w = this.w
 
@@ -407,6 +436,8 @@ export default class Tooltip {
   seriesHoverByContext({ chartCtx, ttCtx, opt, e }) {
     let w = chartCtx.w
     const tooltipEl = this.getElTooltip()
+
+    if (!tooltipEl) return
 
     // tooltipRect is calculated on every mousemove, because the text is dynamic
     ttCtx.tooltipRect = {
@@ -500,6 +531,15 @@ export default class Tooltip {
       e.type === 'touchmove' ||
       e.type === 'mouseup'
     ) {
+      // there is no series to hover over
+      if (
+        w.globals.collapsedSeries.length +
+          w.globals.ancillaryCollapsedSeries.length ===
+        w.globals.series.length
+      ) {
+        return
+      }
+
       if (xcrosshairs !== null) {
         xcrosshairs.classList.add('apexcharts-active')
       }
@@ -626,7 +666,8 @@ export default class Tooltip {
     let j = capj.j
     let capturedSeries = capj.capturedSeries
 
-    if (capj.hoverX < 0 || capj.hoverX > w.globals.gridWidth) {
+    const bounds = opt.elGrid.getBoundingClientRect()
+    if (capj.hoverX < 0 || capj.hoverX > bounds.width) {
       this.handleMouseOut(opt)
       return
     }
@@ -644,10 +685,12 @@ export default class Tooltip {
 
   handleStickyCapturedSeries(e, capturedSeries, opt, j) {
     const w = this.w
-    let ignoreNull = w.globals.series[capturedSeries][j] === null
-    if (ignoreNull) {
-      this.handleMouseOut(opt)
-      return
+    if (!this.tConfig.shared) {
+      let ignoreNull = w.globals.series[capturedSeries][j] === null
+      if (ignoreNull) {
+        this.handleMouseOut(opt)
+        return
+      }
     }
 
     if (typeof w.globals.series[capturedSeries][j] !== 'undefined') {
@@ -694,7 +737,7 @@ export default class Tooltip {
     if (this.ycrosshairs !== null) {
       this.ycrosshairs.classList.remove('apexcharts-active')
     }
-    if (this.blxaxisTooltip) {
+    if (this.isXAxisTooltipEnabled) {
       this.xaxisTooltip.classList.remove('apexcharts-active')
     }
     if (this.yaxisTooltips.length) {

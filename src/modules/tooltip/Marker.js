@@ -1,10 +1,13 @@
-import Graphics from '../Graphics'
-import Position from './Position'
 import Markers from '../../modules/Markers'
 import Utils from '../../utils/Utils'
+import Graphics from '../Graphics'
+import Position from './Position'
 
 /**
  * ApexCharts Tooltip.Marker Class to draw texts on the tooltip.
+ * This file deals with the markers that appear near tooltip in line/area charts.
+ * These markers helps the user to associate the data-points and the values
+ * that are shown in the tooltip
  *
  * @module Tooltip.Marker
  **/
@@ -58,7 +61,7 @@ export default class Marker {
 
         let elPointOptions = marker.getMarkerConfig({
           cssClass: PointClasses,
-          seriesIndex: i
+          seriesIndex: Number(pointsMain.getAttribute('data:realIndex')) // fixes apexcharts/apexcharts.js #1427
         })
 
         point = graphics.drawMarker(0, 0, elPointOptions)

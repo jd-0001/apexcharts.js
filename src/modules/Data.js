@@ -190,7 +190,6 @@ export default class Data {
   }
 
   handleRangeData(ser, i) {
-    const cnf = this.w.config
     const gl = this.w.globals
 
     let range = {}
@@ -203,12 +202,10 @@ export default class Data {
     gl.seriesRangeStart.push(range.start)
     gl.seriesRangeEnd.push(range.end)
 
-    if (cnf.xaxis.type === 'datetime') {
-      gl.seriesRangeBarTimeline.push(range.rangeUniques)
-    }
+    gl.seriesRangeBar.push(range.rangeUniques)
 
     // check for overlaps to avoid clashes in a timeline chart
-    gl.seriesRangeBarTimeline.forEach((sr, si) => {
+    gl.seriesRangeBar.forEach((sr, si) => {
       if (sr) {
         sr.forEach((sarr, sarri) => {
           sarr.y.forEach((arr, arri) => {
@@ -396,8 +393,7 @@ export default class Data {
     const xlabels =
       cnf.labels.length > 0 ? cnf.labels.slice() : cnf.xaxis.categories.slice()
 
-    gl.isTimelineBar =
-      cnf.chart.type === 'rangeBar' && cnf.xaxis.type === 'datetime'
+    gl.isRangeBar = cnf.chart.type === 'rangeBar' && gl.isBarHorizontal
 
     const handleDates = () => {
       for (let j = 0; j < xlabels.length; j++) {
@@ -540,8 +536,8 @@ export default class Data {
       // user provided labels in x prop in [{ x: 3, y: 55 }] data, and those labels are already stored in gl.labels[0], so just re-arrange the gl.labels array
       gl.labels = gl.labels[0]
 
-      if (gl.seriesRangeBarTimeline.length) {
-        gl.seriesRangeBarTimeline.map((srt) => {
+      if (gl.seriesRangeBar.length) {
+        gl.seriesRangeBar.map((srt) => {
           srt.forEach((sr) => {
             if (gl.labels.indexOf(sr.x) < 0 && sr.x) {
               gl.labels.push(sr.x)
@@ -571,8 +567,27 @@ export default class Data {
 
     if (gl.axisCharts) {
       if (gl.series.length > 0) {
-        for (let i = 0; i < gl.series[gl.maxValsInArrayIndex].length; i++) {
-          labelArr.push(i + 1)
+        if (this.isFormatXY()) {
+          // in case there is a combo chart (boxplot/scatter)
+          // and there are duplicated x values, we need to eliminate duplicates
+          const seriesDataFiltered = cnf.series.map((serie, s) => {
+            return serie.data.filter(
+              (v, i, a) => a.findIndex((t) => t.x === v.x) === i
+            )
+          })
+
+          const len = seriesDataFiltered.reduce(
+            (p, c, i, a) => (a[p].length > c.length ? p : i),
+            0
+          )
+
+          for (let i = 0; i < seriesDataFiltered[len].length; i++) {
+            labelArr.push(i + 1)
+          }
+        } else {
+          for (let i = 0; i < gl.series[gl.maxValsInArrayIndex].length; i++) {
+            labelArr.push(i + 1)
+          }
         }
       }
 

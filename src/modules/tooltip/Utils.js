@@ -24,13 +24,12 @@ export default class Utils {
   getNearestValues({ hoverArea, elGrid, clientX, clientY }) {
     let w = this.w
 
-    const hoverWidth = w.globals.gridWidth
-    const hoverHeight = w.globals.gridHeight
+    const seriesBound = elGrid.getBoundingClientRect()
+    const hoverWidth = seriesBound.width
+    const hoverHeight = seriesBound.height
 
     let xDivisor = hoverWidth / (w.globals.dataPoints - 1)
     let yDivisor = hoverHeight / w.globals.dataPoints
-
-    const seriesBound = elGrid.getBoundingClientRect()
 
     const hasBars = this.hasBars()
 
@@ -45,10 +44,7 @@ export default class Utils {
     let hoverY = clientY - seriesBound.top
 
     const notInRect =
-      hoverX < 0 ||
-      hoverY < 0 ||
-      hoverX > w.globals.gridWidth ||
-      hoverY > w.globals.gridHeight
+      hoverX < 0 || hoverY < 0 || hoverX > hoverWidth || hoverY > hoverHeight
 
     if (notInRect) {
       hoverArea.classList.remove('hovering-zoom')
@@ -94,9 +90,18 @@ export default class Utils {
 
     // if X axis type is not category and tooltip is not shared, then we need to find the cursor position and get the nearest value
     if (w.globals.isXNumeric) {
+      // Change origin of cursor position so that we can compute the relative nearest point to the cursor on our chart
+      // we only need to scale because all points are relative to the bounds.left and bounds.top => origin is virtually (0, 0)
+      const chartGridEl = this.ttCtx.getElGrid()
+      const chartGridElBoundingRect = chartGridEl.getBoundingClientRect()
+      const transformedHoverX =
+        hoverX * (chartGridElBoundingRect.width / hoverWidth)
+      const transformedHoverY =
+        hoverY * (chartGridElBoundingRect.height / hoverHeight)
+
       closest = this.closestInMultiArray(
-        hoverX,
-        hoverY,
+        transformedHoverX,
+        transformedHoverY,
         seriesXValArr,
         seriesYValArr
       )
@@ -107,7 +112,7 @@ export default class Utils {
         // initial push, it should be a little smaller than the 1st val
         seriesXValArr = w.globals.seriesXvalues[capturedSeries]
 
-        closest = this.closestInArray(hoverX, seriesXValArr)
+        closest = this.closestInArray(transformedHoverX, seriesXValArr)
 
         j = closest.index
       }
@@ -152,9 +157,9 @@ export default class Utils {
     let diff = diffY + diffX
 
     Yarrays.map((arrY, arrIndex) => {
-      arrY.map((y, innerKey) => {
-        let newdiffY = Math.abs(hoverY - Yarrays[arrIndex][innerKey])
-        let newdiffX = Math.abs(hoverX - Xarrays[arrIndex][innerKey])
+      arrY.map((y, innerIndex) => {
+        let newdiffY = Math.abs(hoverY - Yarrays[arrIndex][innerIndex])
+        let newdiffX = Math.abs(hoverX - Xarrays[arrIndex][innerIndex])
         let newdiff = newdiffX + newdiffY
 
         if (newdiff < diff) {
@@ -162,7 +167,7 @@ export default class Utils {
           diffX = newdiffX
           diffY = newdiffY
           currIndex = arrIndex
-          j = innerKey
+          j = innerIndex
         }
       })
     })
@@ -174,6 +179,7 @@ export default class Utils {
   }
 
   getFirstActiveXArray(Xarrays) {
+    const w = this.w
     let activeIndex = 0
 
     let firstActiveSeriesIndex = Xarrays.map((xarr, index) => {
@@ -181,7 +187,11 @@ export default class Utils {
     })
 
     for (let a = 0; a < firstActiveSeriesIndex.length; a++) {
-      if (firstActiveSeriesIndex[a] !== -1) {
+      if (
+        firstActiveSeriesIndex[a] !== -1 &&
+        w.globals.collapsedSeriesIndices.indexOf(a) === -1 &&
+        w.globals.ancillaryCollapsedSeriesIndices.indexOf(a) === -1
+      ) {
         activeIndex = firstActiveSeriesIndex[a]
         break
       }

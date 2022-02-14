@@ -118,7 +118,7 @@ export default class Config {
     let defaults = new Defaults(opts)
 
     const isBarHorizontal =
-      chartType === 'bar' &&
+      (chartType === 'bar' || chartType === 'boxPlot') &&
       opts.plotOptions &&
       opts.plotOptions.bar &&
       opts.plotOptions.bar.horizontal
@@ -337,22 +337,6 @@ export default class Config {
           `Reversed y-axis in ${config.chart.type} chart is not supported.`
         )
         config.yaxis[0].reversed = false
-      }
-    }
-
-    if (config.chart.group && config.yaxis[0].labels.minWidth === 0) {
-      console.warn(
-        'It looks like you have multiple charts in synchronization. You must provide yaxis.labels.minWidth which must be EQUAL for all grouped charts to prevent incorrect behaviour.'
-      )
-    }
-
-    // if user supplied array for stroke width, it will only be applicable to line/area charts, for any other charts, revert back to Number
-    if (Array.isArray(config.stroke.width)) {
-      if (config.chart.type !== 'line' && config.chart.type !== 'area') {
-        console.warn(
-          'stroke.width option accepts array only for line and area charts. Reverted back to Number'
-        )
-        config.stroke.width = config.stroke.width[0]
       }
     }
 

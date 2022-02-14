@@ -54,11 +54,17 @@ class Range {
     for (let i = startingIndex; i < len; i++) {
       gl.dataPoints = Math.max(gl.dataPoints, series[i].length)
 
+      if (gl.categoryLabels.length) {
+        gl.dataPoints = gl.categoryLabels.filter(
+          (label) => typeof label !== 'undefined'
+        ).length
+      }
       for (let j = 0; j < gl.series[i].length; j++) {
         let val = series[i][j]
         if (val !== null && Utils.isNumber(val)) {
           if (typeof seriesMax[i][j] !== 'undefined') {
             maxY = Math.max(maxY, seriesMax[i][j])
+            lowestY = Math.min(lowestY, seriesMax[i][j])
           }
           if (typeof seriesMin[i][j] !== 'undefined') {
             lowestY = Math.min(lowestY, seriesMin[i][j])
@@ -126,8 +132,7 @@ class Range {
     if (
       cnf.chart.type === 'rangeBar' &&
       gl.seriesRangeStart.length &&
-      gl.isBarHorizontal &&
-      cnf.xaxis.type === 'datetime'
+      gl.isBarHorizontal
     ) {
       minY = lowestY
     }
@@ -442,11 +447,20 @@ class Range {
 
       if (cnf.xaxis.type === 'datetime') {
         const newMinX = datetimeObj.getDate(gl.minX)
-        newMinX.setUTCDate(newMinX.getDate() - 2)
+        if (cnf.xaxis.labels.datetimeUTC) {
+          newMinX.setUTCDate(newMinX.getUTCDate() - 2)
+        } else {
+          newMinX.setDate(newMinX.getDate() - 2)
+        }
+
         gl.minX = new Date(newMinX).getTime()
 
         const newMaxX = datetimeObj.getDate(gl.maxX)
-        newMaxX.setUTCDate(newMaxX.getDate() + 2)
+        if (cnf.xaxis.labels.datetimeUTC) {
+          newMaxX.setUTCDate(newMaxX.getUTCDate() + 2)
+        } else {
+          newMaxX.setDate(newMaxX.getDate() + 2)
+        }
         gl.maxX = new Date(newMaxX).getTime()
       } else if (
         cnf.xaxis.type === 'numeric' ||
@@ -488,7 +502,7 @@ class Range {
             }
           }
         })
-        if (gl.dataPoints === 1 && gl.minXDiff === Number.MAX_VALUE) {
+        if (gl.dataPoints === 1 || gl.minXDiff === Number.MAX_VALUE) {
           // fixes apexcharts.js #1221
           gl.minXDiff = 0.5
         }

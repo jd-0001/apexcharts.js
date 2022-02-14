@@ -70,7 +70,9 @@ export default class Core {
     gl.xyCharts = xyChartsArrTypes.indexOf(ct) > -1
 
     gl.isBarHorizontal =
-      (cnf.chart.type === 'bar' || cnf.chart.type === 'rangeBar') &&
+      (cnf.chart.type === 'bar' ||
+        cnf.chart.type === 'rangeBar' ||
+        cnf.chart.type === 'boxPlot') &&
       cnf.plotOptions.bar.horizontal
 
     gl.chartClass = '.apexcharts' + gl.chartID
@@ -409,7 +411,11 @@ export default class Core {
 
     let chartInnerDimensions = w.globals.radialSize * 2.05
 
-    if (el && !w.config.chart.sparkline.enabled) {
+    if (
+      el &&
+      !w.config.chart.sparkline.enabled &&
+      w.config.plotOptions.radialBar.startAngle !== 0
+    ) {
       let elRadialRect = Utils.getBoundingClientRect(el)
       chartInnerDimensions = elRadialRect.bottom
 

@@ -23,7 +23,7 @@ class Exports {
     // IE11 generates broken SVG that we have to fix by using regex
     if (!Utils.isIE11()) {
       // not IE11 - noop
-      return svgData
+      return svgData.replace(/&nbsp;/g, '&#160;')
     }
 
     // replace second occurrence of "xmlns" attribute with "xmlns:xlink" with correct url + add xmlns:svgjs
@@ -185,7 +185,8 @@ class Exports {
 
     let columns = []
     let rows = []
-    let result = 'data:text/csv;charset=utf-8,\uFEFF'
+    let result = ''
+    let universalBOM = '\uFEFF'
 
     const isTimeStamp = (num) => {
       return w.config.xaxis.type === 'datetime' && String(num).length >= 10
@@ -343,7 +344,8 @@ class Exports {
     result += rows.join(lineDelimiter)
 
     this.triggerDownload(
-      encodeURI(result),
+      'data:text/csv; charset=utf-8,' +
+        encodeURIComponent(universalBOM + result),
       w.config.chart.toolbar.export.csv.filename,
       '.csv'
     )

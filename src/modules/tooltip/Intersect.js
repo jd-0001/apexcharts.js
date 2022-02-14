@@ -2,6 +2,8 @@ import Utils from '../../utils/Utils'
 
 /**
  * ApexCharts Tooltip.Intersect Class.
+ * This file deals with functions related to intersecting tooltips
+ * (tooltips that appear when user hovers directly over a data-point whether)
  *
  * @module Tooltip.Intersect
  **/
@@ -12,10 +14,12 @@ class Intersect {
     this.ttCtx = tooltipContext
   }
 
+  // a helper function to get an element's attribute value
   getAttr(e, attr) {
     return parseFloat(e.target.getAttribute(attr))
   }
 
+  // handle tooltip for heatmaps and treemaps
   handleHeatTreeTooltip({ e, opt, x, y, type }) {
     const ttCtx = this.ttCtx
     const w = this.w
@@ -49,8 +53,11 @@ class Intersect {
       }
       if (ttCtx.w.config.tooltip.followCursor) {
         let seriesBound = w.globals.dom.elWrap.getBoundingClientRect()
-        x = w.globals.clientX - seriesBound.left - ttCtx.tooltipRect.ttWidth / 2
-        y = w.globals.clientY - seriesBound.top - ttCtx.tooltipRect.ttHeight - 5
+        x =
+          w.globals.clientX -
+          seriesBound.left -
+          (x > w.globals.gridWidth / 2 ? ttCtx.tooltipRect.ttWidth : 0)
+        y = w.globals.clientY - seriesBound.top
       }
     }
 
@@ -60,6 +67,10 @@ class Intersect {
     }
   }
 
+  /**
+   * handle tooltips for line/area/scatter charts where tooltip.intersect is true
+   * when user hovers over the marker directly, this function is executed
+   */
   handleMarkerTooltip({ e, opt, x, y }) {
     let w = this.w
     const ttCtx = this.ttCtx
@@ -121,6 +132,9 @@ class Intersect {
     }
   }
 
+  /**
+   * handle tooltips for bar/column charts
+   */
   handleBarTooltip({ e, opt }) {
     const w = this.w
     const ttCtx = this.ttCtx
@@ -155,6 +169,7 @@ class Intersect {
       bx = x
     } else {
       if (!w.globals.comboCharts && !w.config.tooltip.shared) {
+        // todo: re-check this condition as it's always 0
         bx = bx / 2
       }
     }
@@ -212,8 +227,6 @@ class Intersect {
           x = 0
         }
       }
-      tooltipEl.style.left = x + w.globals.translateX + 'px'
-
       if (
         isReversed &&
         !(w.globals.isBarHorizontal && ttCtx.tooltipUtil.hasBars())
@@ -225,11 +238,16 @@ class Intersect {
           w.globals.gridHeight -
           ttCtx.tooltipRect.ttHeight +
           w.globals.translateY
-        tooltipEl.style.top = y + 'px'
       } else {
-        tooltipEl.style.top =
-          y + w.globals.translateY - ttCtx.tooltipRect.ttHeight / 2 + 'px'
+        y = y + w.globals.translateY - ttCtx.tooltipRect.ttHeight / 2
+
+        if (y < 0) {
+          y = 0
+        }
       }
+
+      tooltipEl.style.left = x + w.globals.translateX + 'px'
+      tooltipEl.style.top = y + 'px'
     }
   }
 
