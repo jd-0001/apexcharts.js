@@ -69,8 +69,6 @@ declare module ApexCharts {
     tooltip?: ApexTooltip
     xaxis?: ApexXAxis
     yaxis?: ApexYAxis | ApexYAxis[]
-    endingShape?: 'flat' | 'rounded',
-    startingShape?: 'flat' | 'rounded',
   }
 }
 
@@ -515,6 +513,8 @@ type ApexPlotOptions = {
       position?: string
       orientation?: 'horizontal' | 'vertical'
     }
+    endingShape?: 'flat' | 'rounded'
+    startingShape?: 'flat' | 'rounded'
   }
   bubble?: {
     minBubbleRadius?: number
