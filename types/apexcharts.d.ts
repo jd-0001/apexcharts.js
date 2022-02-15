@@ -506,6 +506,8 @@ type ApexPlotOptions = {
       position?: string
       orientation?: 'horizontal' | 'vertical'
     }
+    startingShape: 'flat' | 'rounded'
+    endingShape: 'flat' | 'rounded'
   }
   bubble?: {
     minBubbleRadius?: number
