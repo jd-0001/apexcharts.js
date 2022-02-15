@@ -6474,20 +6474,16 @@
       key: "getRoundedBars",
       value: function getRoundedBars(w, opts, series, i, j) {
         var graphics = new Graphics(this.barCtx.ctx);
-        var radius = 0;
-        var borderRadius = w.config.plotOptions.bar.borderRadius;
-        var borderRadiusIsArray = Array.isArray(borderRadius);
-
-        if (borderRadiusIsArray) {
-          var radiusIndex = i > borderRadius.length - 1 ? borderRadius.length - 1 : i;
-          radius = borderRadius[radiusIndex];
-        } else {
-          radius = borderRadius;
-        }
-
-        if (w.config.chart.stacked && series.length > 1 && i !== this.barCtx.radiusOnSeriesNumber && !borderRadiusIsArray) {
-          radius = 0;
-        } // if (
+        var radius = w.config.plotOptions.bar.borderRadius; // const borderRadius = w.config.plotOptions.bar.borderRadius
+        // const borderRadiusIsArray = Array.isArray(borderRadius)
+        // if (borderRadiusIsArray) {
+        //   const radiusIndex =
+        //     i > borderRadius.length - 1 ? borderRadius.length - 1 : i
+        //   radius = borderRadius[radiusIndex]
+        // } else {
+        //   radius = borderRadius
+        // }
+        // if (
         //   w.config.chart.stacked &&
         //   series.length > 1 &&
         //   i !== this.barCtx.radiusOnSeriesNumber &&
@@ -6495,7 +6491,6 @@
         // ) {
         //   radius = 0
         // }
-
 
         if (this.barCtx.isHorizontal) {
           var startingShape = '';

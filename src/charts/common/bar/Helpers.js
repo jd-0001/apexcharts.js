@@ -381,26 +381,17 @@ export default class Helpers {
 
   getRoundedBars(w, opts, series, i, j) {
     let graphics = new Graphics(this.barCtx.ctx)
-    let radius = 0
+    let radius = w.config.plotOptions.bar.borderRadius
 
-    const borderRadius = w.config.plotOptions.bar.borderRadius
-    const borderRadiusIsArray = Array.isArray(borderRadius)
-    if (borderRadiusIsArray) {
-      const radiusIndex =
-        i > borderRadius.length - 1 ? borderRadius.length - 1 : i
-      radius = borderRadius[radiusIndex]
-    } else {
-      radius = borderRadius
-    }
-
-    if (
-      w.config.chart.stacked &&
-      series.length > 1 &&
-      i !== this.barCtx.radiusOnSeriesNumber &&
-      !borderRadiusIsArray
-    ) {
-      radius = 0
-    }
+    // const borderRadius = w.config.plotOptions.bar.borderRadius
+    // const borderRadiusIsArray = Array.isArray(borderRadius)
+    // if (borderRadiusIsArray) {
+    //   const radiusIndex =
+    //     i > borderRadius.length - 1 ? borderRadius.length - 1 : i
+    //   radius = borderRadius[radiusIndex]
+    // } else {
+    //   radius = borderRadius
+    // }
 
     // if (
     //   w.config.chart.stacked &&
